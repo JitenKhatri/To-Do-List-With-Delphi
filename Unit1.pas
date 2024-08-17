@@ -1,0 +1,118 @@
+unit Unit1;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TForm1 = class(TForm)
+    lstTasks: TListBox;
+    edtTask: TEdit;
+    btnAddTask: TButton;
+    btnDeleteTask: TButton;
+    btnClearAll: TButton;
+    Label1: TLabel;
+    btnSaveTasks: TButton;
+    btnEditTask: TButton;
+    btnMarkCompleted: TButton;
+    btnSortTasks: TButton;
+    procedure btnAddTaskClick(Sender: TObject);
+    procedure btnDeleteTaskClick(Sender: TObject);
+    procedure btnClearAllClick(Sender: TObject);
+    procedure btnSaveTasksClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure btnEditTaskClick(Sender: TObject);
+    procedure btnMarkCompletedClick(Sender: TObject);
+    procedure btnSortTasksClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm1.btnAddTaskClick(Sender: TObject);
+begin
+if edtTask.Text <> '' then
+  begin
+    lstTasks.Items.Add(edtTask.Text);
+    edtTask.Clear;
+    edtTask.SetFocus;
+  end
+  else
+    ShowMessage('Please enter a task.');
+end;
+
+procedure TForm1.btnClearAllClick(Sender: TObject);
+begin
+if lstTasks.Items.Count > 0 then
+    if MessageDlg('Are you sure you want to clear all tasks?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+      lstTasks.Clear;
+end;
+
+procedure TForm1.btnDeleteTaskClick(Sender: TObject);
+begin
+if lstTasks.ItemIndex >= 0 then
+    lstTasks.Items.Delete(lstTasks.ItemIndex)
+  else
+    ShowMessage('Please select a task to delete.');
+end;
+
+procedure TForm1.btnEditTaskClick(Sender: TObject);
+
+var
+selectedIndex: Integer;
+editedTask: String;
+begin
+selectedIndex := lstTasks.ItemIndex;
+if selectedIndex >= 0 then
+       begin
+         editedTask := InputBox('Edit Task','Modify the selected Task:', lstTasks.Items[selectedIndex]);
+         if editedTask <> '' then
+         lstTasks.Items[selectedIndex] := editedTask;
+       end
+       else
+       ShowMessage('Please Select a task to edit');
+end;
+
+procedure TForm1.btnMarkCompletedClick(Sender: TObject);
+var selectedIndex: Integer;
+    completedTask: String;
+begin
+selectedIndex := lstTasks.ItemIndex;
+if selectedIndex >= 0 then
+begin
+  completedTask := lstTasks.Items[selectedIndex];
+  lstTasks.Items[selectedIndex] := completedTask + ' (completed) ';
+end
+else
+showMessage('Please select a task to mark as completed');
+
+end;
+
+procedure TForm1.btnSaveTasksClick(Sender: TObject);
+begin
+lstTasks.Items.SaveToFile('tasks.txt');
+  ShowMessage('Tasks saved successfully.');
+end;
+
+procedure TForm1.btnSortTasksClick(Sender: TObject);
+begin
+lstTasks.sorted := True;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+if FileExists('tasks.txt') then
+    lstTasks.Items.LoadFromFile('tasks.txt');
+end;
+
+end.
